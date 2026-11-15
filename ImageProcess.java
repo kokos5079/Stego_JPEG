@@ -2,6 +2,10 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 
 public class ImageProcess {
+    BufferedImage fetchImage(File f){
+        
+    }
+
     void hideText(BufferedImage img, byte[] data){
         int width = img.getWidth();
         int height = img.getHeight();
