@@ -1,12 +1,15 @@
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import javax.imageio.ImageIO;
 
 public class ImageProcess {
-    BufferedImage fetchImage(File f){
-        
+
+    public BufferedImage extractImage(File f) throws Exception { // Функция извлечения картинки в матричном виде
+        return ImageIO.read(f);
     }
 
-    void hideText(BufferedImage img, byte[] data){
+    public void EncodeLSB(BufferedImage img, byte[] data){ // Функция встраивания информации в синий канал
         int width = img.getWidth();
         int height = img.getHeight();
 
@@ -42,4 +45,39 @@ public class ImageProcess {
         }   
 
     }
+
+    byte[] decodeLSB(BufferedImage img, int dataLength) {
+        int width = img.getWidth();
+        int height = img.getHeight();
+
+        byte[] data = new byte[dataLength];
+        int dataIndex = 0;
+        int bitIndex = 7;
+        byte currentByte = 0;
+
+        for (int x = 0; x < width; x++){
+            for (int y = 0; y < height; y++){
+                if (dataIndex >= data.length){
+                    return data;
+                }
+
+                Color clr = new Color(img.getRGB(x, y));
+
+                int blue = clr.getBlue();
+                int bit = blue & 1;
+
+                currentByte = (byte) (currentByte | (bit << bitIndex));
+
+                bitIndex--;
+                if (bitIndex < 0){
+                    data[dataIndex] = currentByte;
+                    dataIndex++;
+                    currentByte = 0;
+                    bitIndex = 7;
+                }
+            } 
+        }
+        return data;
+    }
 }
+
