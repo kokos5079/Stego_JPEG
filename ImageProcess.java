@@ -9,32 +9,57 @@ public class ImageProcess {
         return ImageIO.read(f);
     }
 
-    public void EncodeLSB(BufferedImage img, byte[] data){ // Функция встраивания информации в синий канал
-        int width = img.getWidth();
-        int height = img.getHeight();
+    public void encodeLSB(BufferedImage img, byte[] data) {
+    int width = img.getWidth();
+    int height = img.getHeight();
 
-        int dataIndex = 0;
-        int bitIndex = 7;
-        
-        for (int x = 0; x < width; x++){
-            for (int y = 0; y < height; y++){
+    final int metaDataLength = 4;
+    int dataIndex = 0;
+    byte[] dataLength = Convert.intToBytes(data.length);
+    
+    // Индексы для метаданных
+    int metaDataIndex = 0; 
+    int metaBitIndex = 7; // С какого бита начинаем читать байт длины
 
-                if (dataIndex >= data.length){
-                    return;
+    int bitIndex = 7; // Бит для самого сообщения
+    
+    for (int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++) {
+
+            Color clr = new Color(img.getRGB(x, y));
+            int red = clr.getRed();
+            int green = clr.getGreen();
+            int blue = clr.getBlue();
+
+            if (metaDataIndex < metaDataLength) {
+                // --- ЭТАП 1: Встраиваем 4 байта длины ---
+                
+                // Берем текущий байт из массива длины
+                byte lengthByte = dataLength[metaDataIndex];
+                // Извлекаем нужный бит (от старшего к младшему)
+                int lengthBit = (lengthByte >> metaBitIndex) & 1;
+                
+                // Встраиваем бит в синий канал
+                blue = (blue & 0xFE) | lengthBit;
+
+                // Двигаем указатель битов
+                metaBitIndex--;
+                if (metaBitIndex < 0) {
+                    metaBitIndex = 7;       // Сброс на старший бит
+                    metaDataIndex++;        // Переход к следующему байту длины
                 }
 
-                Color clr = new Color(img.getRGB(x, y));
-                int red = clr.getRed();
-                int green = clr.getGreen();
-                int blue = clr.getBlue();
+            } else {
+                // --- ЭТАП 2: Встраиваем само сообщение ---
+                
+                if (dataIndex >= data.length) {
+                    return; // Сообщение закончилось
+                }
 
                 byte msgByte = data[dataIndex];
                 int msgBit = (msgByte >> bitIndex) & 1;
                 
                 blue = (blue & 0xFE) | msgBit;
-
-                Color newColor = new Color(red, green, blue);
-                img.setRGB(x, y, newColor.getRGB());
 
                 bitIndex--;
                 if (bitIndex < 0) {
@@ -42,11 +67,15 @@ public class ImageProcess {
                     dataIndex++;
                 }
             }
-        }   
 
-    }
+            // Сохраняем измененный пиксель (общий код для обоих этапов)
+            Color newColor = new Color(red, green, blue);
+            img.setRGB(x, y, newColor.getRGB());
+        }
+    }   
+}
 
-    byte[] decodeLSB(BufferedImage img, int dataLength) {
+    byte[] decodeLSB(BufferedImage img, int dataLength) { // Функция расшифровки сообщения с передачей размера
         int width = img.getWidth();
         int height = img.getHeight();
 
@@ -79,5 +108,12 @@ public class ImageProcess {
         }
         return data;
     }
+
+    byte[] decodeLSB(BufferedImage img) {
+
+
+        return data;
+    }
+
 }
 
