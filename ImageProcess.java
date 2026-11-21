@@ -1,8 +1,6 @@
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.nio.Buffer;
-
 import javax.imageio.ImageIO;
 
 public class ImageProcess {
@@ -108,6 +106,9 @@ public class ImageProcess {
         return data;
     }
 
+
+// ========= МЕТОДЫ ДЛЯ ВАЛИДАЦИИ =========
+
     private void validateFile(File f){
         if (f == null || !f.exists() || !f.isFile()) {
             throw new IllegalArgumentException("Файл не найден или не доступен.");
@@ -116,7 +117,7 @@ public class ImageProcess {
 
     private void validateImage(BufferedImage img) {
         if (img == null) {
-            throw new IllegalArgumentException("Не удалось прочитать сообщение.");
+            throw new IllegalArgumentException("Не удалось прочитать изображение.");
         }
     }
 
