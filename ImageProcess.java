@@ -2,6 +2,7 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import javax.imageio.ImageIO;
+import java.io.IOException;
 
 public class ImageProcess {
 
@@ -104,6 +105,21 @@ public class ImageProcess {
             data[i] = currentByte;
         }
         return data;
+    }
+
+    public void saveImage(BufferedImage img, File out, String format) throws Exception {
+        validateImage(img);
+        if (out == null) {
+            throw new IllegalArgumentException("Не указан файл для сохранения.");
+        }
+
+        if (format == null || format.isBlank() || format != "png" || format != "bmp") {
+            throw new IllegalArgumentException("Формат для сохранения не указан или не поддерживается.");
+        }
+
+        if (!ImageIO.write(img, format, out)) {
+            throw new IOException("Не удалось сохранить файл.");
+        }
     }
 
 
