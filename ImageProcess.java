@@ -113,7 +113,7 @@ public class ImageProcess {
             throw new IllegalArgumentException("Не указан файл для сохранения.");
         }
 
-        if (format == null || format.isBlank() || format != "png" || format != "bmp") {
+        if (format == null || format.isBlank() || format != "png" && format != "bmp") {
             throw new IllegalArgumentException("Формат для сохранения не указан или не поддерживается.");
         }
 
@@ -142,7 +142,7 @@ public class ImageProcess {
         if (data == null || data.length == 0) {
             throw new IllegalArgumentException("Отсутствуют данные для встраивания.");
         }
-        int maxBytes = ((int) img.getWidth() * img.getHeight() - 32) / 8;
+        long maxBytes = ((long) img.getWidth() * img.getHeight() - 32) / 8;
         if (data.length > maxBytes) {
             throw new IllegalArgumentException("Недостаточно места для встраивания данных.");
         }
@@ -150,14 +150,14 @@ public class ImageProcess {
 
     private void validateDecode(BufferedImage img) {
         validateImage(img);
-        int imgSize = img.getHeight() * img.getWidth();
+        long imgSize = img.getHeight() * img.getWidth();
         if (imgSize < 32) {
             throw new IllegalArgumentException("Изображение слишком мало.");
         }
     }
 
     private void validateDataLength(int dataLength, int width, int height) {
-        int maxBytes = ((int) width * height - 32) / 8;
+        long maxBytes = ((long) width * height - 32) / 8;
         if (dataLength <= 0 || dataLength > maxBytes) {
             throw new IllegalArgumentException("Неверная длина сообщения.");
         }
@@ -169,8 +169,8 @@ public class ImageProcess {
             throw new IllegalArgumentException("Некорректное смещение или длина чтения.");
         }
         
-        int imgSize = width * height;
-        int lastByte = offset + length * 8;
+        long imgSize = width * height;
+        long lastByte = offset + length * 8;
         if (lastByte > imgSize) {
             throw new IllegalArgumentException("Выход за пределы изображения при чтении");
         }
