@@ -113,7 +113,7 @@ public class ImageProcess {
             throw new IllegalArgumentException("Не указан файл для сохранения.");
         }
 
-        if (format == null || format.isBlank() || format != "png" && format != "bmp") {
+        if (format == null || (!format.equalsIgnoreCase("png") && !format.equalsIgnoreCase("bmp"))) {
             throw new IllegalArgumentException("Формат для сохранения не указан или не поддерживается.");
         }
 
